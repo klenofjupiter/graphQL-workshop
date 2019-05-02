@@ -11,7 +11,7 @@ type Barista {
 	id: ID!
 	dateHired: String!
 	dateLeft: String
-	transactionList: [Transaction!]!
+	transactionList: [Transaction!]
 	rating: BaristaRating
 	Human: Human
 }
@@ -33,13 +33,14 @@ type Product {
 	madeOnSite: Boolean!
 	recipe: Recipe
 	price: Float!
+	stock: Int
 }
 type Recipe {
 	id: ID!
 	description: String
 	ingredientList: [Product!]!
 	instructions: String
-
+	author: Human
 }
 type Transaction {
 	id:ID!
@@ -60,10 +61,12 @@ type ContactDossier {
 # we wouldnt really want the commented out ones because we'd just filter off the huaman
 type Query {
 	allProducts: [Product!]!
+	allTransactions: [Transaction!]!
 	# allCustomers: [Customer!]!
 	# allBaristas: [Barista!]!
 	allHumans: [Human!]!
 	Product(id:ID!): Product
+	Transaction:(id:ID!)Transaction
 	# Customer(id:ID!): Customer
 	# Barista(id:ID!): Barista
 	Human(id:ID!): Human
@@ -72,11 +75,29 @@ input BaristaLeftMutation {
 	id: ID!
 	dateLeft:String 
 }
-input WholePerson 
-type Mutation {
-	baristaLeaving(input: BaristaLeftMutation): WholePerson!
-	hireBarista()
-}
 
+input NewBarista {
+	human:Human, 
+	dateHired: String, 
+}
+input purchaseInput {
+	customer: Customer 
+	barista: Barista 
+	order: [Product!]!
+	dateTime: String
+	totalPrice: Float
+}
+type Mutation {
+	baristaLeaving(input: BaristaLeftMutation): Barista!
+	hireBarista(input: NewBarista): Human! #????
+	purchase(input: purchaseInput)
+}
+subscription {
+	newPurchase {
+		barista
+		customer
+		order
+	}
+}
 
 
