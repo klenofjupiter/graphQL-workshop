@@ -1,0 +1,29 @@
+#heres how you make custom scalar types
+scalar BigInt
+scalar DateTime
+
+#here's the schema for our Photo type
+type Photo {
+	id: ID! #five scalar type: ID, String, Int, Float, Boolean, there are maybe other compound types? 
+	name: String! # bang means non-nullable (eg required field)
+	description: String 
+	category: PhotoCategory!
+}
+
+#here's where we're defining the ENUM referenced in the category field 
+enum PhotoCategory {
+	SELFIE
+	LANDSCAPE
+	ACTION
+}
+ 
+ #Query will define all queries available on your API -- this is the SCHEMA not the actual business logic 
+ #we still have to write the functions which will go get the data 
+type Query {
+	allPhotos: [Photo!]!  #returns a list of type photos -- exclamations in this context mean "no null returns, and no null values with the RETURN LIST" so a 0 results response is an empty array
+	photo(id: ID!): Photo! #returns a single result of type Photo (an object), which matches the REQUIRED argument 
+	totalPhotos: Int! 
+}
+
+
+ #note that this is language-agnostic -- you can run a graphQL server in any language }
