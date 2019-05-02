@@ -1,3 +1,6 @@
+# if this file started to get bigger, you could probably put everything in separate files, and use a "main.graphql" to glue 'em all back together
+#Apollo Engine 
+
 #heres how you make custom scalar types
 scalar BigInt
 scalar DateTime
@@ -8,6 +11,13 @@ type Photo {
 	name: String! # bang means non-nullable (eg required field)
 	description: String 
 	category: PhotoCategory!
+}
+
+type User {
+	githubLogin: ID!
+	name: String!
+	avatar: String!
+	postedPhotos: [Photo!]! # this returns a list of photos --> associated photos 
 }
 
 #here's where we're defining the ENUM referenced in the category field 
@@ -22,8 +32,30 @@ enum PhotoCategory {
 type Query {
 	allPhotos: [Photo!]!  #returns a list of type photos -- exclamations in this context mean "no null returns, and no null values with the RETURN LIST" so a 0 results response is an empty array
 	photo(id: ID!): Photo! #returns a single result of type Photo (an object), which matches the REQUIRED argument 
-	totalPhotos: Int! 
+	totalPhotos: Int!
+	allUsers: [User!]!
+	user(githubLogin:ID!): User! #so like, if you wanted to make the login parameter not requrired, you could set up your logic to return a "default user" if there was no ID passed 
+	totalUsers: Int!
 }
 
+#this is a handy abstraction 
+input PostPhotoInput {
+	name: String! 
+	description: String 
+	category: PhotoCategory
+}
+#what if we wanted our post request to return not just the created object, but instead a whole bunch of metadata along with it? 
+#SIMPLE! we'd create a custom response object
+type PostPhotoMutationResponse {
+	photo: Photo
+	user: User 
+	datePosted: String
+}
 
- #note that this is language-agnostic -- you can run a graphQL server in any language }
+type Mutation  {
+	deletePhoto(input: PostPhotoInput): Photo! 
+	postPhoto(input: PostPhotoInput!): PostPhotoMutationResponse! #this tells us that this mutation will return a photo 
+	batchUpdatePhoto(input: [PostPhotoInput!]!): [PostPhotoMutationResponse!]!
+}
+
+ #note that this is language-agnostic -- you can run a graphQL server in any language }}
